@@ -4,6 +4,8 @@ go 1.22.10
 
 require (
 	github.com/cloudwego/hertz v0.9.4
+	github.com/hertz-contrib/logger/logrus v1.0.1
+	github.com/sirupsen/logrus v1.9.3
 	golang.org/x/net v0.33.0
 )
 

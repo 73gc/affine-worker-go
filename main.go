@@ -3,12 +3,15 @@
 package main
 
 import (
+	"affine-worker-go/biz/common/logutil"
+
 	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 )
 
 func main() {
 	h := server.Default()
-
+	hlog.SetLogger(logutil.Logger)
 	register(h)
 	h.Spin()
 }

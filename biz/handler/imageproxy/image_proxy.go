@@ -3,8 +3,10 @@ package imageproxy
 import (
 	"affine-worker-go/biz/common/myutils"
 	"context"
+	"errors"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -12,6 +14,7 @@ import (
 func ImageProxy(ctx context.Context, c *app.RequestContext) {
 	rawURL := c.Query("url")
 	if rawURL == "" {
+		hlog.Warn(errors.New(`missing "url" parameter`))
 		c.JSON(consts.StatusBadRequest, utils.H{
 			"msg": `Missing "url" parameter`,
 		})
@@ -19,6 +22,7 @@ func ImageProxy(ctx context.Context, c *app.RequestContext) {
 	}
 	targetURL, err := myutils.FixURL(rawURL)
 	if err != nil || targetURL == nil {
+		hlog.Error(err)
 		c.JSON(consts.StatusBadRequest, utils.H{
 			"msg": "Invalid URL",
 		})
