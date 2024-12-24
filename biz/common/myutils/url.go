@@ -12,8 +12,8 @@ func FixURL(rawURL string) (*url.URL, error) {
 		return nil, nil
 	}
 	fullURL := rawURL
-	if !strings.HasPrefix(fullURL, "http:") || !strings.HasPrefix(fullURL, "https:") {
-		fullURL = "http" + fullURL
+	if !strings.HasPrefix(fullURL, "http:") && !strings.HasPrefix(fullURL, "https:") {
+		fullURL = "http:" + fullURL
 	}
 	parsedURL, err := url.Parse(fullURL)
 	if err != nil {
@@ -25,7 +25,7 @@ func FixURL(rawURL string) (*url.URL, error) {
 	}
 	var fullDomain string
 	if parsedRawURL.Subdomain != "" {
-		fullDomain = parsedRawURL.Subdomain + parsedRawURL.Domain
+		fullDomain = parsedRawURL.Subdomain + "." + parsedRawURL.Domain
 	} else {
 		fullDomain = parsedRawURL.Domain
 	}

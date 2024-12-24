@@ -1,6 +1,7 @@
 package imageproxy
 
 import (
+	"affine-worker-go/biz/common/headerutil"
 	"affine-worker-go/biz/common/myutils"
 	"context"
 	"errors"
@@ -28,4 +29,13 @@ func ImageProxy(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	}
+	headers, err := headerutil.CloneHeaders(&c.Request.Header)
+	if err != nil {
+		hlog.Error("invalid headers:", err)
+		c.JSON(consts.StatusBadRequest, utils.H{
+			"msg": "Failed to fetch image",
+		})
+		return
+	}
+	c.JSON(consts.StatusOK, headers)
 }
