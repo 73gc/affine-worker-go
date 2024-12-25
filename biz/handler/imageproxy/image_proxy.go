@@ -29,17 +29,12 @@ func ImageProxy(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	}
-	headers := myutils.CloneHeaders(&c.Request.Header)
-	req, err := http.NewRequest(string(c.Request.Method()), targetURL.String(), nil)
-	if err != nil {
-		hlog.Error("image proxy error: ", err)
-		c.JSON(consts.StatusInternalServerError, utils.H{
-			"msg": "Failed to fetch image",
-		})
+	req := &http.Request{
+		Method: string(c.Method()),
+		URL:    targetURL,
+		Header: myutils.CloneHeaders(&c.Request.Header),
 	}
-	for key, value := range headers {
-		req.Header.Set(key, value)
-	}
+	// hlog.Debug(req)
 	resp, err := httpclient.Do(req)
 	if err != nil {
 		hlog.Error("image proxy error: ", err)
