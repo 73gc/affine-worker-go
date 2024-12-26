@@ -22,7 +22,7 @@ func LinkPreview(ctx context.Context, c *app.RequestContext) {
 	body := make(map[string]interface{})
 	data, err := c.Body()
 	if err != nil {
-		hlog.Error("invalid request body")
+		hlog.Error("invalid request body: ", err)
 		c.JSON(consts.StatusBadRequest, utils.H{
 			"msg": "Invalid request body",
 		})
@@ -30,7 +30,7 @@ func LinkPreview(ctx context.Context, c *app.RequestContext) {
 	}
 	err = json.Unmarshal(data, &body)
 	if err != nil {
-		hlog.Error("invalid request body")
+		hlog.Error("invalid request body: ", err)
 		c.JSON(consts.StatusBadRequest, utils.H{
 			"msg": "Invalid request body",
 		})
@@ -66,6 +66,7 @@ func LinkPreview(ctx context.Context, c *app.RequestContext) {
 		URL:    targetURL,
 		Header: myutils.CloneHeaders(&c.Request.Header),
 	}
+	hlog.Debug(req)
 	resp, err := httpclient.Do(req)
 	if err != nil {
 		hlog.Error("link preview error: ", err)
@@ -76,7 +77,7 @@ func LinkPreview(ctx context.Context, c *app.RequestContext) {
 	}
 	defer resp.Body.Close()
 	respBody := map[string]interface{}{
-		"url":      resp.Request.URL,
+		"url":      resp.Request.URL.String(),
 		"images":   []string{},
 		"videos":   []string{},
 		"favicons": []string{},
@@ -102,6 +103,7 @@ func LinkPreview(ctx context.Context, c *app.RequestContext) {
 				continue
 			}
 			if currentNode.DataAtom == atom.Meta {
+				hlog.Debug(true)
 				var property, content string
 				for _, attr := range currentNode.Attr {
 					if attr.Key == "property" || attr.Key == "name" {
@@ -124,11 +126,13 @@ func LinkPreview(ctx context.Context, c *app.RequestContext) {
 				case "og:image":
 					respBody["images"] = appendURL(content, respBody["images"].([]string))
 				case "og:video":
-					respBody["videos"] = appendURL(content, respBody["videos"].([]string))
+					respBody["videos"] = appendURL(content, respBody["vides"].([]string))
 				case "og:type":
 					respBody["mediaType"] = content
 				case "description":
-					respBody["description"] = content
+					if _, exist := respBody["description"]; !exist {
+						respBody["description"] = content
+					}
 				}
 			}
 			if currentNode.DataAtom == atom.Link {
@@ -145,8 +149,40 @@ func LinkPreview(ctx context.Context, c *app.RequestContext) {
 					respBody["favicons"] = appendURL(href, respBody["favicons"].([]string))
 				}
 			}
+			if currentNode.DataAtom == atom.Title {
+				if chi := currentNode.FirstChild; chi != nil && chi.Type == html.TextNode {
+					if _, exist := respBody["title"]; !exist {
+						respBody["title"] = chi.Data
+					}
+				}
+			}
+			if currentNode.DataAtom == atom.Img {
+				var imgSrc string
+				for _, attr := range currentNode.Attr {
+					if attr.Key == "src" {
+						imgSrc = attr.Val
+						break
+					}
+				}
+				if imgSrc != "" {
+					respBody["images"] = appendURL(imgSrc, respBody["images"].([]string))
+				}
+			}
+			if currentNode.DataAtom == atom.Video {
+				var videoSrc string
+				for _, attr := range currentNode.Attr {
+					if attr.Key == "src" {
+						videoSrc = attr.Val
+						break
+					}
+				}
+				if videoSrc != "" {
+					respBody["vides"] = appendURL(videoSrc, respBody["videos"].([]string))
+				}
+			}
 		}
 	}
+	c.JSON(consts.StatusOK, respBody)
 }
 
 func appendURL(rawURL string, urls []string) []string {

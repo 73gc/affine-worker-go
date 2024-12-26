@@ -5,6 +5,7 @@ package main
 import (
 	handler "affine-worker-go/biz/handler"
 	"affine-worker-go/biz/handler/imageproxy"
+	"affine-worker-go/biz/handler/linkpreview"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
@@ -13,5 +14,6 @@ import (
 func customizedRegister(r *server.Hertz) {
 	r.GET("/ping", handler.Ping)
 	r.Any("/image-proxy", imageproxy.ImageProxy)
+	r.Any("/link-preview", linkpreview.LinkPreview)
 	// your code ...
 }
