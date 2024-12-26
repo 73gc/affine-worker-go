@@ -66,7 +66,6 @@ func LinkPreview(ctx context.Context, c *app.RequestContext) {
 		URL:    targetURL,
 		Header: myutils.CloneHeaders(&c.Request.Header),
 	}
-	hlog.Debug(req)
 	resp, err := httpclient.Do(req)
 	if err != nil {
 		hlog.Error("link preview error: ", err)
