@@ -64,7 +64,7 @@ func LinkPreview(ctx context.Context, c *app.RequestContext) {
 	req := &http.Request{
 		Method: http.MethodGet,
 		URL:    targetURL,
-		Header: myutils.CloneHeaders(&c.Request.Header),
+		// Header: myutils.CloneHeaders(&c.Request.Header),
 	}
 	resp, err := httpclient.Do(req)
 	if err != nil {
@@ -102,7 +102,6 @@ func LinkPreview(ctx context.Context, c *app.RequestContext) {
 				continue
 			}
 			if currentNode.DataAtom == atom.Meta {
-				hlog.Debug(true)
 				var property, content string
 				for _, attr := range currentNode.Attr {
 					if attr.Key == "property" || attr.Key == "name" {
