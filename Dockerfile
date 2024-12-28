@@ -11,10 +11,10 @@ COPY . .
 RUN go mod tidy
 
 # Step 5: Build the golang project
-RUN go build -o affine-worker-go
+RUN bash ./build.sh
 
 # Step 6: Expose the port the app runs on
 EXPOSE 8888
 
 # Step 7: Define the command to run the app
-CMD ["./affine-worker-go"]
+CMD ["./output/bin/affine-worker-go"]
