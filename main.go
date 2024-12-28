@@ -4,13 +4,22 @@ package main
 
 import (
 	"affine-worker-go/biz/common/logutil"
+	"time"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/hertz-contrib/cors"
 )
 
 func main() {
 	h := server.Default()
+	h.Use(cors.New(cors.Config{
+		AllowOrigins:  []string{"https://note.fwnhub.cn", "http://localhost:8888", "http://127.0.0.1:8888"},
+		AllowMethods:  []string{"PUT", "GET", "POST", "HEAD"},
+		AllowHeaders:  []string{"Origin"},
+		ExposeHeaders: []string{"Content-Type", "Content-Length", "Content-Disposition"},
+		MaxAge:        12 * time.Hour,
+	}))
 	hlog.SetLogger(logutil.Logger)
 	register(h)
 	h.Spin()
