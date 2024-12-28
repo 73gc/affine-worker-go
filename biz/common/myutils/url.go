@@ -29,7 +29,7 @@ func FixURL(rawURL string) (*url.URL, error) {
 	} else {
 		fullDomain = parsedRawURL.Domain
 	}
-	if fullDomain == parsedURL.Hostname() {
+	if fullDomain == parsedURL.Hostname() && parsedURL.Hostname() != "" {
 		return parsedURL, nil
 	}
 	return nil, errors.New("invalid url")

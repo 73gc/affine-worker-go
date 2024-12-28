@@ -180,6 +180,10 @@ func LinkPreview(ctx context.Context, c *app.RequestContext) {
 			}
 		}
 	}
+	if len(respBody["favicons"].([]string)) <= 0 {
+		faviconUrl := targetURL.Scheme + "://" + targetURL.Host + "/" + "favicon.ico"
+		respBody["favicons"] = appendURL(faviconUrl, respBody["favicons"].([]string))
+	}
 	c.JSON(consts.StatusOK, respBody)
 }
 
